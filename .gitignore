@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+*.joblib
+.ipynb_checkpoints/
+mlflow-artifacts/
+mariadb/data/mysql/data/
+airflow/logs/
+*.sqlite
+.DS_Store
