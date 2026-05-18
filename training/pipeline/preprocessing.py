@@ -1,7 +1,12 @@
 import joblib
 import pandas as pd
 from pathlib import Path
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder, StandardScaler, MinMaxScaler
+from sklearn.preprocessing import (
+    OneHotEncoder,
+    LabelEncoder,
+    StandardScaler,
+    MinMaxScaler,
+)
 
 ONE_HOT_FEATURES = ["married", "self_employed"]
 LABEL_FEATURES = ["property_area", "family_dependents"]
@@ -12,10 +17,18 @@ REPLACE_MAP = {
     "loan_status": {"Loan Default": 1, "Creditworthy": 0},
 }
 FEATURE_COLS = [
-    "gender", "family_dependents", "education",
-    "applicant_income", "coapplicant_income", "loan_amount_term",
-    "credit_history", "property_area",
-    "married_No", "married_Yes", "self_employed_No", "self_employed_Yes",
+    "gender",
+    "family_dependents",
+    "education",
+    "applicant_income",
+    "coapplicant_income",
+    "loan_amount_term",
+    "credit_history",
+    "property_area",
+    "married_No",
+    "married_Yes",
+    "self_employed_No",
+    "self_employed_Yes",
 ]
 TARGET_COL = "loan_status"
 
@@ -44,8 +57,9 @@ def fit_preprocessors(df: pd.DataFrame) -> dict:
 
     min_max_scalers = {}
     for col in NUMERIC_FEATURES:
+        scaled = standard_scalers[col].transform(df[[col]])
         mm = MinMaxScaler()
-        mm.fit(df[[col]])
+        mm.fit(scaled)
         min_max_scalers[col] = mm
     preprocessors["min_max_scalers"] = min_max_scalers
 
