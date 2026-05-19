@@ -169,3 +169,31 @@ from schemas.request import LoanApplicantRequest
 
 **핵심 교훈**
 Docker 컨테이너에서 FastAPI 앱을 실행할 때 WORKDIR를 앱 루트(`/app`)로 설정하면, 패키지 내부 임포트는 절대 경로가 아닌 상대 경로(또는 WORKDIR 기준)로 작성해야 한다.
+
+---
+
+## 8. Nginx 502 Bad Gateway — 컨테이너 재생성 후 upstream IP 캐싱
+
+**에러 메시지**
+```
+502 Bad Gateway
+connect() failed (111: Connection refused) while connecting to upstream: http://172.22.0.5:8000/predict
+```
+
+**원인**
+Nginx는 시작 시점에 upstream 호스트명(`api`)을 한 번만 DNS 조회해 IP를 캐싱한다. API 컨테이너가 재생성되면 새 IP를 할당받지만 Nginx는 기존 IP로 계속 요청해 Connection refused가 발생한다.
+
+**해결 방법**
+`nginx.conf`에 Docker 내부 DNS resolver(`127.0.0.11`)를 추가하고, upstream을 변수로 선언해 요청마다 DNS를 재조회하도록 설정한다.
+
+```nginx
+location / {
+    resolver 127.0.0.11 valid=10s;
+    set $upstream http://api:8000;
+    proxy_pass $upstream;
+    ...
+}
+```
+
+**핵심 교훈**
+Docker Compose 환경에서 Nginx upstream을 고정 블록(`upstream {}`)으로 선언하면 IP 캐싱 문제가 발생한다. `resolver 127.0.0.11`과 변수(`set $upstream`)를 사용하면 컨테이너 재생성 시에도 DNS를 동적으로 재조회한다.
