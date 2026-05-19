@@ -1,8 +1,8 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from api.routers import health, predict
-from api.services.model_service import ModelService
-from api.services.preprocess_service import PreprocessService
+from routers import health, predict
+from services.model_service import ModelService
+from services.preprocess_service import PreprocessService
 
 model_service = ModelService()
 preprocess_service = PreprocessService()

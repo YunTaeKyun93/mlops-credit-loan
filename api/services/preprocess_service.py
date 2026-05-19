@@ -2,7 +2,7 @@ import os
 import mlflow
 import joblib
 import numpy as np
-from api.schemas.request import LoanApplicantRequest
+from schemas.request import LoanApplicantRequest
 
 
 class PreprocessService:

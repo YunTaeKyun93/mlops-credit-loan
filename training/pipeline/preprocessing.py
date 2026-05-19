@@ -35,6 +35,10 @@ TARGET_COL = "loan_status"
 
 def fit_preprocessors(df: pd.DataFrame) -> dict:
     """학습 데이터로 전처리기를 훈련하고 딕셔너리로 반환한다."""
+    df = df.copy()
+    df["family_dependents"] = df["family_dependents"].fillna("0")
+    df["loan_amount_term"] = df["loan_amount_term"].fillna(60)
+
     preprocessors = {}
 
     one_hot_encoder = OneHotEncoder()

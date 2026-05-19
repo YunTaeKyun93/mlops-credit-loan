@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
-from api.schemas.request import LoanApplicantRequest
-from api.schemas.response import PredictResponse
+from schemas.request import LoanApplicantRequest
+from schemas.response import PredictResponse
 
 router = APIRouter()
 

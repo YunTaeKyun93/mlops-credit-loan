@@ -102,10 +102,10 @@ MariaDB init scripts and seed data live in `mariadb/data/docker-entrypoint-initd
 - [x] api/services/model_service.py
 - [x] api/services/preprocess_service.py
 
-### Phase 3 — 통합 테스트
-- [ ] docker-compose up 전체 스택 실행
-- [ ] 첫 MLflow 실험 로깅 확인
-- [ ] Airflow DAG 실행
+### Phase 3 — 통합 테스트 ✅ 완료
+- [x] docker-compose up 전체 스택 실행
+- [x] 첫 MLflow 실험 로깅 확인
+- [x] Airflow DAG 실행
 
 ## Python 환경
 - conda mlops-study (3.11.14)

@@ -12,12 +12,14 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     MLFLOW_TRACKING_URI: http://mlflow:5000
+    MLFLOW_ARTIFACT_ROOT: /mlflow/artifacts
     MARIADB_URL: mysql+pymysql://${MARIADB_USER}:${MARIADB_PASSWORD}@mariadb:3306/${MARIADB_DATABASE}
   volumes:
     - ./airflow/dags:/opt/airflow/dags
     - ./airflow/plugins:/opt/airflow/plugins
     - ./training:/opt/airflow/training
     - airflow-logs:/opt/airflow/logs
+    - mlflow-artifacts:/mlflow/artifacts
   networks:
     - mlops-net
   depends_on:
@@ -35,14 +37,24 @@ services:
     volumes:
       - ./mariadb/data/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
       - ./mariadb/data/mlops_table_data:/mlops_table_data
+      - ./mariadb/data/mlops_table_data:/var/lib/mysql-files
       - ./mariadb/data/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
       - mariadb-data:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "3307:3306"
     networks:
       - mlops-net
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MARIADB_ROOT_PASSWORD}"]
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-uroot",
+          "-p${MARIADB_ROOT_PASSWORD}",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -105,6 +117,9 @@ services:
       MARIADB_URL: mysql+pymysql://${MARIADB_USER}:${MARIADB_PASSWORD}@mariadb:3306/${MARIADB_DATABASE}
       MODEL_NAME: ${MODEL_NAME}
       MODEL_STAGE: ${MODEL_STAGE}
+    volumes:
+      - mlflow-artifacts:/mlflow/artifacts
+      - ./training:/app/training
     ports:
       - "8000:8000"
     networks:

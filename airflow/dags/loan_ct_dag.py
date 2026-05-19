@@ -69,20 +69,20 @@ def loan_ct_dag():
         return run_id
 
     @task
-    def evaluate_model(base_dir: str, run_id: str) -> bool:
+    def evaluate_model(base_dir: str, mlflow_run_id: str) -> bool:
         model = joblib.load(f"{base_dir}/model.joblib")
         x_train = pd.read_parquet(f"{base_dir}/x_train.parquet")
         y_train = pd.read_parquet(f"{base_dir}/y_train.parquet").squeeze()
         x_test = pd.read_parquet(f"{base_dir}/x_test.parquet")
         y_test = pd.read_parquet(f"{base_dir}/y_test.parquet").squeeze()
-        with mlflow.start_run(run_id=run_id):
+        with mlflow.start_run(run_id=mlflow_run_id):
             metrics = evaluate(model, x_train, y_train, x_test, y_test)
         promotable = is_promotable(metrics)
         log.info("Metrics: %s | promotable=%s", metrics, promotable)
         return promotable
 
     @task
-    def register(base_dir: str, run_id: str, promotable: bool) -> None:
+    def register(base_dir: str, promotable: bool, mlflow_run_id: str) -> None:
         if not promotable:
             log.info(
                 "Skipping registration: promotion criteria not met "
@@ -90,7 +90,7 @@ def loan_ct_dag():
             )
             raise AirflowSkipException("Promotion criteria not met")
         model = joblib.load(f"{base_dir}/model.joblib")
-        with mlflow.start_run(run_id=run_id):
+        with mlflow.start_run(run_id=mlflow_run_id):
             register_model(model, MODEL_NAME, f"{base_dir}/preprocessors.joblib")
         client = mlflow.MlflowClient()
         version = client.get_latest_versions(MODEL_NAME, stages=["None"])[0].version
@@ -104,9 +104,9 @@ def loan_ct_dag():
 
     base_dir = extract()
     base_dir = preprocess(base_dir)
-    run_id = train(base_dir)
-    promotable = evaluate_model(base_dir, run_id)
-    register(base_dir, run_id, promotable)
+    mlflow_run_id = train(base_dir)
+    promotable = evaluate_model(base_dir, mlflow_run_id)
+    register(base_dir, promotable, mlflow_run_id)
 
 
 loan_ct_dag()

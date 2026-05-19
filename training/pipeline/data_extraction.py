@@ -12,14 +12,15 @@ def extract_features(db_url: str, cutoff_ym: str) -> pd.DataFrame:
     Returns:
         ineligible_loan_model_features_target 테이블 DataFrame
     """
-    sql = text("""
+    sql = """
         SELECT *
-          FROM temp.ineligible_loan_model_features_target
+          FROM mlops.ineligible_loan_model_features_target
          WHERE base_ym <= :cutoff_ym
-    """)
+    """
     engine = create_engine(db_url)
     with engine.connect() as conn:
-        return pd.read_sql(sql, con=conn, params={"cutoff_ym": cutoff_ym})
+        result = conn.execute(text(sql), {"cutoff_ym": cutoff_ym})
+        return pd.DataFrame(result.fetchall(), columns=list(result.keys()))
 
 
 def extract_predict_targets(db_url: str, base_dt: str) -> pd.DataFrame:
@@ -32,11 +33,12 @@ def extract_predict_targets(db_url: str, base_dt: str) -> pd.DataFrame:
     Returns:
         ineligible_loan_model_features 테이블 DataFrame
     """
-    sql = text("""
+    sql = """
         SELECT f.*
           FROM mlops.ineligible_loan_model_features f
          WHERE f.base_dt = :base_dt
-    """)
+    """
     engine = create_engine(db_url)
     with engine.connect() as conn:
-        return pd.read_sql(sql, con=conn, params={"base_dt": base_dt})
+        result = conn.execute(text(sql), {"base_dt": base_dt})
+        return pd.DataFrame(result.fetchall(), columns=list(result.keys()))
