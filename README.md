@@ -198,3 +198,12 @@ Response: `PredictResponse` 배열
 ## 트러블슈팅
 
 개발 중 발생한 이슈와 해결 방법은 [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)를 참조하세요.
+
+---
+
+## 개발 방식
+
+- Claude Code(AI 코딩 에이전트)를 활용한 AI-assisted 개발 워크플로우 적용
+- 코드 생성 후 직접 코드 리뷰 및 구조 이해
+- Phase 3 통합 테스트 중 발생한 7개 트러블슈팅 직접 해결
+- 에이전트 활용 능력과 코드 이해력을 함께 키우는 방식으로 진행
