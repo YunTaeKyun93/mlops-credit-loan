@@ -63,6 +63,7 @@ services:
     build:
       context: ./mlflow
       dockerfile: Dockerfile
+    user: root
     environment:
       MLFLOW_BACKEND_STORE_URI: mysql+pymysql://root:${MARIADB_ROOT_PASSWORD}@mariadb:3306/mlflow
       MLFLOW_ARTIFACT_ROOT: /mlflow/artifacts
